@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from .services.selector import seleccionar_popup, seleccionar_popup_test
+from  popups.services.selector import seleccionar_popup
+from  popups.services.selector import seleccionar_popup_test
 
 api = Blueprint("api", __name__)
 
