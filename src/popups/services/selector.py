@@ -1,5 +1,5 @@
-from src.extensions import db
-from src.models.popupsm.popup import Popup
+from extensions import db
+from models.popupsm.popup import Popup
 from sqlalchemy.exc import SQLAlchemyError
 from models.publicaciones.publicaciones import Publicacion
 from models.publicaciones.estado_publi_usu import Estado_publi_usu
