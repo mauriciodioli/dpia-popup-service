@@ -1,0 +1,19 @@
+<form method="POST" enctype="multipart/form-data">
+  <label>Imagen:</label>
+  <input type="file" name="imagen" required>
+
+  <label>Medidas:</label>
+  <input type="number" name="ancho" placeholder="Ancho (px)" required>
+  <input type="number" name="alto" placeholder="Alto (px)" required>
+
+  <label>Dominio:</label>
+  <select name="dominio_id">...</select>
+
+  <label>Categoría:</label>
+  <select name="categoria_id">...</select>
+
+  <label>Link del micrositio o publicidad:</label>
+  <input type="url" name="micrositio_url" placeholder="https://...">
+
+  <button type="submit" class="btn btn-primary">Crear Popup</button>
+</form>

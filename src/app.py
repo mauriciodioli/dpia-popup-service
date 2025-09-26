@@ -30,6 +30,12 @@ from controllers.conexionesSheet.conexion_externa import conexion_externa
 from controllers.scrape_amazon_dpia import scrape_amazon_dpia
 from controllers.filtro_publicacion import filtro_publicacion
 
+from popups.api import popups_api_bp
+
+from popups.services.selector import seleccionar_popup
+from controllers.popups.popup import popup
+
+
 # Registrar blueprints
 app.register_blueprint(selenium_controller)
 app.register_blueprint(datoSheet)
@@ -37,6 +43,10 @@ app.register_blueprint(conexion_externa)
 app.register_blueprint(publicaciones)
 app.register_blueprint(scrape_amazon_dpia)
 app.register_blueprint(filtro_publicacion)
+
+app.register_blueprint(popups_api_bp)
+app.register_blueprint(popup)
+
 
 # Probar conexión
 def test_db_connection():
@@ -52,5 +62,5 @@ def test_db_connection():
 test_db_connection()
 
 if __name__ == '__main__':   
-    app.run(host="0.0.0.0", port=8000, debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", port=8100, debug=True, use_reloader=False)
 
