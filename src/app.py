@@ -30,7 +30,7 @@ from controllers.conexionesSheet.conexion_externa import conexion_externa
 from controllers.scrape_amazon_dpia import scrape_amazon_dpia
 from controllers.filtro_publicacion import filtro_publicacion
 
-from popups.api import popups_api_bp
+from popups.api import api
 
 from popups.services.selector import seleccionar_popup
 from controllers.popups.popup import popup
@@ -44,7 +44,7 @@ app.register_blueprint(publicaciones)
 app.register_blueprint(scrape_amazon_dpia)
 app.register_blueprint(filtro_publicacion)
 
-app.register_blueprint(popups_api_bp)
+app.register_blueprint(api)
 app.register_blueprint(popup)
 
 
