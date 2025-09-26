@@ -31,8 +31,6 @@ from controllers.scrape_amazon_dpia import scrape_amazon_dpia
 from controllers.filtro_publicacion import filtro_publicacion
 
 from popups.api import api
-
-from popups.services.selector import seleccionar_popup
 from controllers.popups.popup import popup
 
 
