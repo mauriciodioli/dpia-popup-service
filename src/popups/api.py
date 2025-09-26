@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from  popups.services.selector import seleccionar_popup
+from  popups.services.selector import seleccionar_popup_test
 
 api = Blueprint("api", __name__)
 
@@ -10,7 +12,7 @@ def api_popup():
         "lang": request.args.get("lang"),
         "cp": request.args.get("cp"),
     }
-    popup = 'seleccionar_popup_test(**params)'
+    popup = seleccionar_popup_test(**params)
     if not popup:
         return jsonify({"found": False}), 200
     return jsonify({"found": True, **popup}), 200
