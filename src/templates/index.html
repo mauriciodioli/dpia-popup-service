@@ -3,48 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Datos del Sheet</title>
+  <title>Panel Admin</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin:0; padding:0; }
+    nav { background:#222; padding:8px; }
+    nav button {
+      background:#444; color:#fff; border:none; padding:8px 16px; margin-right:6px;
+      cursor:pointer; border-radius:4px;
+    }
+    nav button.active { background:#007bff; }
+    section.tab { display:none; padding:20px; }
+    section.tab.active { display:block; }
+    h1 { margin-top:0; }
+  </style>
 </head>
 <body>
-  <h1 style="color: aliceblue;">Cargar lugar del Sheet</h1>
+  <!-- Barra de navegación -->
+  <nav>
+    <button data-tab="tab-sheet" class="active">📊 Datos del Sheet</button>
+    <button data-tab="tab-publicidad">🎯 Publicidades</button>
+  </nav>
 
-  <select id="pais" name="pais">
-    <option value="">Seleccione un lugar</option>
-    <option value="argentina">Argentina</option>
-    <option value="canada">Canadá</option>
-    <option value="francia">Francia</option>
-    <option value="italia">Italia</option>
-    <option value="estados_unidos">Estados Unidos</option>
-    <option value="alemania">Alemania</option>
-    <option value="barcelona">barcelona</option>
-    <option value="perugia">perugia</option>
-    <option value="poznan">poznan</option>
-    <option value="spoleto">spoleto</option>
-    <option value="cerdenia">cerdenia</option>
-  </select>
+  <!-- Pestaña 1 -->
+  <section id="tab-sheet" class="tab active">
+    <h1 style="color: aliceblue;">Cargar lugar del Sheet</h1>
 
-
+    <select id="pais" name="pais">
+      <option value="">Seleccione un lugar</option>
+      <option value="argentina">Argentina</option>
+      <option value="canada">Canadá</option>
+      <option value="francia">Francia</option>
+      <option value="italia">Italia</option>
+      <option value="estados_unidos">Estados Unidos</option>
+      <option value="alemania">Alemania</option>
+      <option value="barcelona">barcelona</option>
+      <option value="perugia">perugia</option>
+      <option value="poznan">poznan</option>
+      <option value="spoleto">spoleto</option>
+      <option value="cerdenia">cerdenia</option>
+    </select>
 
     <select id="ArchivosCargados" name="ArchivosCargados">
-     <option value="">Seleccione un Archivo</option>    
+      <option value="">Seleccione un Archivo</option>    
     </select>
 
     <button id="btnEliminarArchivo" class="btn btn-danger ms-2" disabled>Eliminar Archivo</button>
 
-  <br><br>
+    <br><br>
 
- 
- <button id="btn-scrapear" style="display: block; margin-bottom: 10px;">🔍 Ejecutar scraping Apify</button>
-<button id="btn-scrapear-imagenes" style="display: block; margin-bottom: 10px;">🧠 Ejecutar scraping Para imágenes</button>
-<button id="btn-cargar-sheet" style="display: block;">📥 Cargar de Scrapeado</button>
+    <button id="btn-scrapear" style="display: block; margin-bottom: 10px;">🔍 Ejecutar scraping Apify</button>
+    <button id="btn-scrapear-imagenes" style="display: block; margin-bottom: 10px;">🧠 Ejecutar scraping Para imágenes</button>
+    <button id="btn-cargar-sheet" style="display: block;">📥 Cargar de Scrapeado</button>
 
+    <div id="resultado" style="margin-top: 20px;"></div>
 
-  <div id="resultado" style="margin-top: 20px;"></div>
+    <script src="{{ url_for('static', filename='scrape_amazon.js') }}"></script>
+    <script src="{{ url_for('static', filename='resultado_carga.js') }}"></script>
+  </section>
 
-  <script src="{{ url_for('static', filename='scrape_amazon.js') }}"></script>
-  <script src="{{ url_for('static', filename='resultado_carga.js') }}"></script>
+  <!-- Pestaña 2 -->
+  <section id="tab-publicidad" class="tab">
+    
+    {% include "popuptemp/popup_form.html" %}
+    <!-- 👆 aquí se inyecta la interfaz que te armé antes -->
+  </section>
 
+  <script>
+    // Cambiar de pestaña
+    $("nav button").on("click", function(){
+      $("nav button").removeClass("active");
+      $(this).addClass("active");
+      const tab = $(this).data("tab");
+      $("section.tab").removeClass("active");
+      $("#"+tab).addClass("active");
+    });
+  </script>
 </body>
 </html>

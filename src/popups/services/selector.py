@@ -14,30 +14,35 @@ from models.publicaciones.ambitos import Ambitos
 from models.publicaciones.ambito_usuario import Ambito_usuario
 from models.publicaciones.ambitoCategoriaRelation import AmbitoCategoriaRelation
 from models.categoriaCodigoPostal import CategoriaCodigoPostal
+import controllers.publicaciones as publicaciones
 
 def seleccionar_popup(dominio=None, categoria=None, lang=None, cp=None):
     q = db.session.query(Popup).filter(Popup.estado == "activo")
 
+    # Filtros suaves (permiten NULL como comodín)
     if lang:
         q = q.filter((Popup.idioma == lang) | (Popup.idioma.is_(None)))
     if cp:
         q = q.filter((Popup.codigo_postal == cp) | (Popup.codigo_postal.is_(None)))
 
+    # Ambito (dominio)
+    amb_id = None
     if dominio:
-        amb = db.session.query(Ambitos.id).filter(Ambitos.valor == dominio).first()
-        if amb:
-            q = q.filter((Popup.dominio_id == amb.id) | (Popup.dominio_id.is_(None)))
+        amb = publicaciones.machear_ambito(dominio, lang)
+        # puede venir un obj con .id o directamente un int
+        amb_id = getattr(amb, "id", amb)
+        if amb_id is not None:
+            q = q.filter((Popup.dominio_id == amb_id) | (Popup.dominio_id.is_(None)))
 
+    # Categoría (usa amb_id si existe)
     if categoria:
-        cat = db.session.query(CategoriaPublicacion.id).filter(CategoriaPublicacion.nombre == categoria).first()
-        if cat:
-            q = q.filter((Popup.categoria_id == cat.id) | (Popup.categoria_id.is_(None)))
+        cat = publicaciones.machear_ambitoCategoria(categoria, lang, amb_id)
+        cat_id = getattr(cat, "id", cat)
+        if cat_id is not None:
+            q = q.filter((Popup.categoria_id == cat_id) | (Popup.categoria_id.is_(None)))
 
-    p = q.order_by(
-        Popup.prioritario.desc(),
-        Popup.fecha_creacion.desc()
-    ).first()
-
+    # Orden: primero prioridad, luego más nuevo
+    p = q.order_by(Popup.prioritario.desc(), Popup.fecha_creacion.desc()).first()
     if not p:
         return None
 
@@ -47,9 +52,9 @@ def seleccionar_popup(dominio=None, categoria=None, lang=None, cp=None):
         "image": p.imagen_url,
         "width": p.medida_ancho or 400,
         "height": p.medida_alto or 600,
-        "href": p.micrositio_url or "#",
+        # destino: primero link (click), luego micrositio como fallback
+        "href": p.link or p.micrositio_url or "#",
     }
-
 
 # src/popups/services/selector.py
 def seleccionar_popup_test(dominio=None, categoria=None, lang=None, cp=None):

@@ -73,7 +73,7 @@ class Popup(db.Model):
         )
 
     @classmethod
-    def crear_tabla_si_no_existe(cls):
+    def crear_tabla_popup(cls):
         insp = inspect(db.engine)
         if not insp.has_table(cls.__tablename__):
             db.create_all()
@@ -89,3 +89,42 @@ class PopupSchema(SQLAlchemyAutoSchema):
 
 popup_schema = PopupSchema()
 popups_schema = PopupSchema(many=True)
+
+# ---------- Helper: mapear payload del form a modelo ----------
+def mapear_form_a_modelo(data: dict) -> dict:
+    """
+    Front envía (nombres de formulario):
+      dominio, categoria, lang, cp, title, href, image, width, height, prioritario, activo
+    Modelo espera:
+      titulo, imagen_url, link, idioma, codigo_postal, medida_ancho, medida_alto, ...
+    """
+    return {
+        # campos de negocio
+        "titulo":         data.get("title") or data.get("titulo"),
+        "imagen_url":     data.get("image") or data.get("imagen_url"),
+        "link":           data.get("href")  or data.get("link"),
+        "micrositio_url": data.get("micrositio_url"),  # opcional
+
+        # segmentación
+        "idioma":         data.get("lang") or data.get("idioma"),
+        "codigo_postal":  data.get("cp")   or data.get("codigo_postal"),
+
+        # FKs (si ya vienen por id)
+        "dominio_id":     data.get("dominio_id"),
+        "categoria_id":   data.get("categoria_id"),
+        "publicacion_id": data.get("publicacion_id"),
+        "user_id":        data.get("user_id"),
+
+        # otros
+        "prioritario":    int(data.get("prioritario") or 0),
+        "estado":         ("activo" if (str(data.get("activo")) in ("1", "true", "True")) else data.get("estado")) or "activo",
+        "medida_ancho":   int(data.get("width")  or data.get("medida_ancho") or 400),
+        "medida_alto":    int(data.get("height") or data.get("medida_alto") or 600),
+
+        # guardo texto crudo por si tengo que resolver FKs
+        "ambito":         data.get("dominio")   or data.get("ambito"),
+        "categoria":      data.get("categoria"),
+        
+        # pasa el email para validación (NO es columna del popup)
+        "email":          data.get("email") or data.get("correo_electronico"),
+    }

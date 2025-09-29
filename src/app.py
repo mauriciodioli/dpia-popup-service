@@ -48,6 +48,8 @@ from controllers.conexionesSheet.conexion_externa import conexion_externa
 from controllers.scrape_amazon_dpia import scrape_amazon_dpia
 from controllers.filtro_publicacion import filtro_publicacion
 
+
+
 from popups.api import api
 from controllers.popups.popup import popup
 
@@ -60,11 +62,36 @@ app.register_blueprint(filtro_publicacion)
 app.register_blueprint(api)
 app.register_blueprint(popup)
 
+
+
+
+# ---------- Crear tablas (incluye 'popup') ----------
+with app.app_context():
+    # IMPORTA el/los modelos con LA MISMA instancia de db (extensions.db)
+    try:
+        from models.popupsm.popup import Popup  # si vive acá
+    except Exception:
+        from controllers.popups.popup import Popup  # si lo definiste ahí
+
+    # Log de sanity check
+    print("DB URL:", db.engine.url)
+    print("Metadata antes:", list(db.metadata.tables.keys()))
+
+    # Crea TODO lo mapeado
+    db.create_all()
+
+    # Airbag extra: fuerza creación SOLO de popup si faltara
+    Popup.__table__.create(bind=db.engine, checkfirst=True)
+
+    print("Metadata después:", list(db.metadata.tables.keys()))
+    print("Tablas creadas/verificadas (create_all).")
 # Probar conexión
 def test_db_connection():
+    
     try:
         with app.app_context():
             db.engine.connect()
+            
             print("Conexión exitosa a la base de datos.")
     except OperationalError as e:
         print(f"Error de conexión a la base de datos: {e}")

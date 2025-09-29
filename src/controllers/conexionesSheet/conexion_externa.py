@@ -9,7 +9,7 @@ import requests
 import time
 import json
 
-from utils.db import db
+from extensions import db
 
 import random
 from pydrive.auth import GoogleAuth
@@ -19,6 +19,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from controllers.conexionesSheet.datosSheet import login, autenticar_y_abrir_sheet
 from controllers.publicaciones import completar_publicaciones
+from models.create_tablas import crea_tablas_DB
 import pprint
 import os #obtener el directorio de trabajo actual
 import json
@@ -37,6 +38,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 @conexion_externa.route("/")
 def index():
+    
     # Aquí puedes realizar cualquier lógica adicional que necesites
     return render_template("index.html")
 
