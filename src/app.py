@@ -1,14 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask
+from flask_cors import CORS  # ⬅️ nuevo
 from config import DATABASE_CONNECTION_URI
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
-# Importar desde extensions
 from extensions import db, ma
 
-# Crear la aplicación Flask
 app = Flask(__name__)
 
-# Configuración
+# --- Config ---
 app.secret_key = '*0984632'
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_CONNECTION_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -18,11 +17,25 @@ app.config['SQLALCHEMY_POOL_SIZE'] = 10
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
 app.config['SQLALCHEMY_MAX_OVERFLOW'] = 10
 
-# Inicializar extensiones con el app
+# ⬅️ Habilitar CORS solo para las rutas /api/*
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [
+        "https://dpia.site",
+        "https://*.dpia.site"
+    ]}},
+    methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+    supports_credentials=False,
+    max_age=86400,
+)
+
+
+# Extensiones
 db.init_app(app)
 ma.init_app(app)
 
-# Importar blueprints
+# Blueprints
 from controllers.selenium_controller import selenium_controller
 from controllers.conexionesSheet.datosSheet import datoSheet
 from controllers.publicaciones import publicaciones
@@ -33,18 +46,14 @@ from controllers.filtro_publicacion import filtro_publicacion
 from popups.api import api
 from controllers.popups.popup import popup
 
-
-# Registrar blueprints
 app.register_blueprint(selenium_controller)
 app.register_blueprint(datoSheet)
 app.register_blueprint(conexion_externa)
 app.register_blueprint(publicaciones)
 app.register_blueprint(scrape_amazon_dpia)
 app.register_blueprint(filtro_publicacion)
-
 app.register_blueprint(api)
 app.register_blueprint(popup)
-
 
 # Probar conexión
 def test_db_connection():
@@ -59,6 +68,5 @@ def test_db_connection():
 
 test_db_connection()
 
-if __name__ == '__main__':   
+if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8100, debug=True, use_reloader=False)
-

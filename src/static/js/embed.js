@@ -59,11 +59,18 @@
                    categoria: attr(anchor,"data-categoria")||"",
                    lang: attr(anchor,"data-lang")||"",
                    cp: attr(anchor,"data-cp")||"" };
+      debugger;
+     fetch(apiBase, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(params)
+            })
+            .then(r => r.json())
+            .then(j => render(anchor, j))
+            .catch(() => { /* si falla, dejamos el placeholder */ });
 
-      fetch(buildUrl(apiBase,params))
-        .then(r=>r.json())
-        .then(j=>render(anchor,j))
-        .catch(()=>{/* si falla, dejamos el placeholder */});
     });
   }
   if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}else{init();}
