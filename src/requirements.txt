@@ -1,4 +1,4 @@
-# Core
+# Core 
 flask
 sqlalchemy
 flask_sqlalchemy
@@ -25,3 +25,6 @@ webdriver_manager
 
 # Archivos y permisos
 PyDrive==1.3.1
+
+# CORS
+flask-cors
