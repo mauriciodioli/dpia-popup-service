@@ -121,3 +121,92 @@ def resolve_active_user_id_from_email(data: dict):
         return None, (403, "Usuario inactivo")
 
     return int(user.id), None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# --- LISTAR por email (valida usuario activo) ---
+@popup.get("/admin/popup/list")
+def list_popups_by_email():
+    email = (request.args.get("email") or "").strip().lower()
+    if not email:
+        return jsonify({"ok": False, "error": "Falta email"}), 400
+
+    # Reutiliza tu helper
+    user_id, err = resolve_active_user_id_from_email({"email": email})
+    if err:
+        code, msg = err
+        return jsonify({"ok": False, "error": msg}), code
+
+    items = (
+        db.session.query(Popup)
+        .filter(Popup.user_id == user_id)
+        .order_by(Popup.fecha_creacion.desc())
+        .all()
+    )
+    return jsonify({"ok": True, "items": popups_schema.dump(items)}), 200
+
+
+# --- OBTENER detalle ---
+@popup.get("/admin/popup/<int:popup_id>")
+def get_popup(popup_id):
+    p = db.session.get(Popup, popup_id)
+    if not p:
+        return jsonify({"ok": False, "error": "No existe"}), 404
+    return jsonify({"ok": True, "popup": popup_schema.dump(p)}), 200
+
+
+# --- ACTUALIZAR (PUT parcial) ---
+@popup.put("/admin/popup/<int:popup_id>")
+def update_popup(popup_id):
+    p = db.session.get(Popup, popup_id)
+    if not p:
+        return jsonify({"ok": False, "error": "No existe"}), 404
+
+    data = request.get_json(silent=True) or {}
+    # campos permitidos
+    fields = {
+        "titulo", "imagen_url", "micrositio_url", "link", "idioma", "codigo_postal",
+        "dominio_id", "categoria_id", "publicacion_id", "prioritario", "estado",
+        "medida_ancho", "medida_alto"
+    }
+    try:
+        for k, v in data.items():
+            if k in fields:
+                setattr(p, k, v)
+        db.session.commit()
+        return jsonify({"ok": True, "popup": popup_schema.dump(p)}), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+# --- ELIMINAR ---
+@popup.delete("/admin/popup/<int:popup_id>")
+def delete_popup(popup_id):
+    p = db.session.get(Popup, popup_id)
+    if not p:
+        return jsonify({"ok": False, "error": "No existe"}), 404
+    try:
+        db.session.delete(p)
+        db.session.commit()
+        return jsonify({"ok": True}), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({"ok": False, "error": str(e)}), 500

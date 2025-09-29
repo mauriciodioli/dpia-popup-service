@@ -9,10 +9,7 @@
   <style>
     body { font-family: system-ui, sans-serif; margin:0; padding:0; }
     nav { background:#222; padding:8px; }
-    nav button {
-      background:#444; color:#fff; border:none; padding:8px 16px; margin-right:6px;
-      cursor:pointer; border-radius:4px;
-    }
+    nav button { background:#444; color:#fff; border:none; padding:8px 16px; margin-right:6px; cursor:pointer; border-radius:4px; }
     nav button.active { background:#007bff; }
     section.tab { display:none; padding:20px; }
     section.tab.active { display:block; }
@@ -24,6 +21,7 @@
   <nav>
     <button data-tab="tab-sheet" class="active">📊 Datos del Sheet</button>
     <button data-tab="tab-publicidad">🎯 Publicidades</button>
+    <button data-tab="tab-gestionar">🧾 Mis Publicidades</button>
   </nav>
 
   <!-- Pestaña 1 -->
@@ -46,7 +44,7 @@
     </select>
 
     <select id="ArchivosCargados" name="ArchivosCargados">
-      <option value="">Seleccione un Archivo</option>    
+      <option value="">Seleccione un Archivo</option>
     </select>
 
     <button id="btnEliminarArchivo" class="btn btn-danger ms-2" disabled>Eliminar Archivo</button>
@@ -65,10 +63,12 @@
 
   <!-- Pestaña 2 -->
   <section id="tab-publicidad" class="tab">
-    
     {% include "popuptemp/popup_form.html" %}
-    <!-- 👆 aquí se inyecta la interfaz que te armé antes -->
+    <!-- 👆 Alta/preview de publicidades -->
   </section>
+
+  <!-- Pestaña 3 (hermana, NO anidada) -->
+  {% include "popuptemp/popup_form_modifica.html" %}
 
   <script>
     // Cambiar de pestaña
@@ -80,5 +80,9 @@
       $("#"+tab).addClass("active");
     });
   </script>
+
+  <!-- Cargá los JS una sola vez (no dentro del parcial) -->
+  <script src="{{ url_for('static', filename='js/popup_form/popup_form_modifica.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
 </body>
 </html>
