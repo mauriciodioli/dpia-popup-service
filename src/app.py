@@ -16,21 +16,26 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SQLALCHEMY_POOL_SIZE'] = 10
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 280
 app.config['SQLALCHEMY_MAX_OVERFLOW'] = 10
+ALLOWED_ORIGINS = [
+    # DEV
+    "http://127.0.0.1:5001",
+    "http://localhost:5001",
+    # PROD (ajusta a tus dominios reales)
+    "https://dpia.site",
+    "https://www.dpia.site",
+    # si usas IP directa para pruebas
+    "http://54.234.169.22:5001",
+    "http://54.234.169.22",
+]
 
-# ⬅️ Habilitar CORS solo para las rutas /api/*
 CORS(
     app,
-    resources={r"/api/*": {"origins": [
-        "https://dpia.site",
-        "https://*.dpia.site"
-    ]}},
+    resources={r"/api/*": {"origins": ALLOWED_ORIGINS}},
     methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
     supports_credentials=False,
     max_age=86400,
 )
-
-
 # Extensiones
 db.init_app(app)
 ma.init_app(app)
