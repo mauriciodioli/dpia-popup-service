@@ -59,9 +59,17 @@ function renderOne(anchor, item){
       </a>
     </div>`;
 
-  anchor.querySelector(".dpia-popup-close").addEventListener("click", e => {
-    e.preventDefault(); anchor.innerHTML = "";
-  });
+  const btnClose = anchor.querySelector(".dpia-popup-close");
+btnClose.addEventListener("click", (e) => {
+  e.preventDefault();
+  const card = anchor.closest(".popup-fake-card")
+             || anchor.closest(".card-publicacion-admin")
+             || anchor;
+  card.style.transition = "opacity .15s ease";
+  card.style.opacity = "0";
+  setTimeout(() => card.remove(), 150);
+});
+
 }
 
 
