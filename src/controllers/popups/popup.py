@@ -37,6 +37,11 @@ popup = Blueprint('popup', __name__)
 
 SHEET_ID_DETECTOR_TENDENCIA = os.environ.get('SHEET_ID_DETECTOR_TENDENCIA')
 
+
+
+
+
+
 # ---------- Endpoint: crear popup ----------
 @popup.post("/admin/popup")
 def crear_popup():

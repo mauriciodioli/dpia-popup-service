@@ -28,7 +28,10 @@ def seleccionar_popup(dominio=None, categoria=None, lang=None, cp=None):
     # Ambito (dominio)
     amb_id = None
     if dominio:
-        amb = publicaciones.machear_ambito(dominio, lang)
+        if str(dominio).isdigit():
+            amb = publicaciones.machear_ambito_id(dominio, lang)
+        else:
+            amb = publicaciones.machear_ambito(dominio, lang)
         # puede venir un obj con .id o directamente un int
         amb_id = getattr(amb, "id", amb)
         if amb_id is not None:
@@ -36,7 +39,10 @@ def seleccionar_popup(dominio=None, categoria=None, lang=None, cp=None):
 
     # Categoría (usa amb_id si existe)
     if categoria:
-        cat = publicaciones.machear_ambitoCategoria(categoria, lang, amb_id)
+        if str(dominio).isdigit():
+           cat = publicaciones.machear_ambitoCategoria_id(categoria, lang)
+        else:
+          cat = publicaciones.machear_ambitoCategoria(categoria, lang, amb_id)
         cat_id = getattr(cat, "id", cat)
         if cat_id is not None:
             q = q.filter((Popup.categoria_id == cat_id) | (Popup.categoria_id.is_(None)))
@@ -55,6 +61,65 @@ def seleccionar_popup(dominio=None, categoria=None, lang=None, cp=None):
         # destino: primero link (click), luego micrositio como fallback
         "href": p.link or p.micrositio_url or "#",
     }
+
+
+
+
+
+
+
+
+
+def _serialize_popup(p):
+    return {
+        "id": p.id,
+        "title": p.titulo or "",
+        "image": p.imagen_url,
+        "width": p.medida_ancho or 400,
+        "height": p.medida_alto or 600,
+        "href": p.link or p.micrositio_url or "#",
+    }
+
+def seleccionar_popups(dominio=None, categoria=None, lang=None, cp=None, limit=None):
+    q = db.session.query(Popup).filter(Popup.estado == "activo")
+
+    # comodines: idioma y CP permiten NULL
+    if lang:
+        q = q.filter((Popup.idioma == lang) | (Popup.idioma.is_(None)))
+    if cp:
+        q = q.filter((Popup.codigo_postal == cp) | (Popup.codigo_postal.is_(None)))
+
+    # Ámbito (dominio)
+    amb_id = None
+    if dominio:
+        if str(dominio).isdigit():
+            amb = publicaciones.machear_ambito_id(dominio, lang)
+        else:
+            amb = publicaciones.machear_ambito(dominio, lang)
+        amb_id = getattr(amb, "id", amb)
+        if amb_id is not None:
+            q = q.filter((Popup.dominio_id == amb_id) | (Popup.dominio_id.is_(None)))
+
+    # Categoría (usar amb_id si existe)  **FIX**: usar 'categoria' acá
+    if categoria:
+        if str(categoria).isdigit():
+            cat = publicaciones.machear_ambitoCategoria_id(categoria, lang)
+        else:
+            cat = publicaciones.machear_ambitoCategoria(categoria, lang, amb_id)
+        cat_id = getattr(cat, "id", cat)
+        if cat_id is not None:
+            q = q.filter((Popup.categoria_id == cat_id) | (Popup.categoria_id.is_(None)))
+
+    # Orden: prioridad desc, luego más nuevo
+    q = q.order_by(Popup.prioritario.desc(), Popup.fecha_creacion.desc())
+
+    rows = q.limit(limit).all() if limit else q.all()
+    return [_serialize_popup(p) for p in rows]
+
+
+
+
+
 
 # src/popups/services/selector.py
 def seleccionar_popup_test(dominio=None, categoria=None, lang=None, cp=None):

@@ -22,7 +22,7 @@ from models.video import Video
 from models.codigoPostal import CodigoPostal
 from controllers.conexionesSheet.datosSheet import  actualizar_estado_en_sheet
 from models.publicaciones.ambito_general import get_or_create_ambito
-
+from sqlalchemy import and_
 import controllers.conexionesSheet.datosSheet as datoSheet
 import os
 import random
@@ -224,6 +224,33 @@ def registrar_media(publicacion_id, imagen_id, video_id, tipo='imagen', size=0):
         db.session.add(media)
     except Exception as e:
         print(f"❌ Error en registrar_media: {e}")
+        
+        
+def machear_ambito_id(ambito_input, idioma='es'):
+    if not ambito_input:
+        return None
+
+    try:
+        ambito_id = int(ambito_input)  # Asegura que sea un entero
+    except ValueError:
+        print(f"❌ ID inválido para ámbito: '{ambito_input}'")
+        return None
+
+    ambito = (
+        db.session.query(Ambitos)
+        .filter(
+            Ambitos.id == ambito_id,
+            Ambitos.idioma == idioma
+        )
+        .first()
+    )
+
+    if ambito:
+        return ambito
+    else:
+        print(f"⚠️ No se encontró ámbito con ID {ambito_id} e idioma '{idioma}'")
+        return None
+
 def machear_ambito(ambito_input, idioma='es'):
     if not ambito_input:
         return None
@@ -243,7 +270,9 @@ def machear_ambito(ambito_input, idioma='es'):
         return ambito
     else:
         print(f"⚠️ No se encontró ámbito para la categoría: '{ambito_normalizado}'")
-        return None
+        return None 
+    
+    
 def machear_ambitoCategoria(categoria, idioma='es', ambito_id=None):
     if not categoria:
         print("❌ Categoría vacía")
@@ -287,6 +316,41 @@ def machear_ambitoCategoria(categoria, idioma='es', ambito_id=None):
         print(f"❌ Error creando categoría '{categoria}': {e}")
         db.session.rollback()
         return None
+    
+    
+    
+ 
+def machear_ambitoCategoria_id(categoria, idioma='es'):
+    if not categoria:
+        print("❌ Categoría vacía")
+        return None
+
+    try:
+        cat_id = int(categoria)
+    except ValueError:
+        print(f"❌ ID de categoría inválido: '{categoria}'")
+        return None
+
+    try:
+        with db.session.no_autoflush:
+            ambito_categoria = (
+                db.session.query(AmbitoCategoria)
+                .filter_by(id=cat_id, idioma=idioma)
+                .first()
+            )
+
+        if ambito_categoria:
+            print(f"✅ Categoría encontrada: ID {ambito_categoria.id}")
+            return ambito_categoria.id
+
+        print("⚠️ No se encontró la categoría")
+        return None
+
+    except SQLAlchemyError as e:
+        print(f"❌ Error consultando categoría '{categoria}': {e}")
+        return None
+ 
+    
 
 def machear_usuario(user_id):
     try:

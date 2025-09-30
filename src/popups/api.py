@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from popups.services.selector import seleccionar_popup, seleccionar_popup_test
+from popups.services.selector import seleccionar_popup, seleccionar_popup_test,seleccionar_popups
 import sys
 
 api = Blueprint("api", __name__)
@@ -37,3 +37,18 @@ def api_popup():
 @api.get("/health")
 def health():
     return {"ok": True, "service": "dpia-popup-service"}, 200
+
+
+
+@api.route("/api/popup/list", methods=["POST"])
+def api_popup_list():
+    b = request.get_json(silent=True) or {}
+    items = seleccionar_popups(
+        dominio=b.get("dominio"),
+        categoria=b.get("categoria"),
+        lang=b.get("lang"),
+        cp=b.get("cp"),
+        limit=b.get("limit"),  # opcional
+    )
+    return jsonify({"items": items, "found": bool(items)}), 200
+

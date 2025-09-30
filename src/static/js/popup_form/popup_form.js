@@ -229,20 +229,28 @@ btnGuardar && btnGuardar.addEventListener('click', function(){
     ].join('\n');
   }
 
-  function buildDivSnippet(data) {
-    // data viene de formToJSON()
-    const attrs = [
-      `class="dpia-popup-anchor"`,
-      `data-dominio="${data.dominio || ''}"`,
-      `data-categoria="${data.categoria || ''}"`,
-      `data-lang="${data.lang || ''}"`,
-      data.cp ? `data-cp="${data.cp}"` : null,
-      `data-width="${data.width || 800}"`,
-      `data-height="${data.height || 200}"`,
-      `data-placeholder-color="#7CFC00"`,
-    ].filter(Boolean).join(' ');
-    return `<div ${attrs}></div>`;
-  }
+function buildDivSnippet(data) {
+  const usaIds = !!(data.ambito_id && data.categoria_id);
+
+  const attrs = [
+    `class="dpia-popup-anchor"`,
+    usaIds
+      ? `data-ambito-id="${data.ambito_id}"`
+      : `data-dominio="${data.dominio || ''}"`,
+    usaIds
+      ? `data-categoria-id="${data.categoria_id}"`
+      : `data-categoria="${data.categoria || ''}"`,
+    // 👇 SIEMPRE incluir el idioma
+    `data-lang="${data.lang || ''}"`,
+    data.cp ? `data-cp="${data.cp}"` : null,
+    `data-width="${data.width || 800}"`,
+    `data-height="${data.height || 200}"`,
+    `data-placeholder-color="#7CFC00"`
+  ].filter(Boolean).join(' ');
+
+  return `<div ${attrs}></div>`;
+}
+
 
   function updateSnippets() {
     const data = (window.DPIA && window.DPIA.formToJSON)
