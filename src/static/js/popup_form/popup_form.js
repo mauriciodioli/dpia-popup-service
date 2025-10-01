@@ -216,8 +216,8 @@ btnGuardar && btnGuardar.addEventListener('click', function(){
 
   function buildScriptSnippet(host, test = true) {
     // En producción, cambiá test=false
-    const apiUrl = `${host}/api/popup${test ? '?test=1' : ''}/`;
-    const embedSrc = `${host}/static/js/embed.js/`;
+    const apiUrl = `${host}/api/popup${test ? '?test=1' : ''}`;
+    const embedSrc = `${host}/static/js/embed.js`;
 
     // Si tu embed.js ya hace autodetección de host con rutas relativas, podés usar data-api="/api/popup"
     return [
