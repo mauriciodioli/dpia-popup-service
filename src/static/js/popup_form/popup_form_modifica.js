@@ -36,6 +36,9 @@
         <td>${p.categoria_id ?? ""}</td>
         <td>${p.estado || ""}</td>
         <td>
+          ${p.imagen_url ? `<img src="${p.imagen_url}" alt="img" class="mini-img" style="width:40px; height:auto; border-radius:4px;">` : ''}
+        </td>
+        <td>
           <button class="btn ghost btnSnippet" data-id="${p.id}">📎 Snippet</button>
           <button class="btn ghost btn-editar"  data-id="${p.id}">✏️ Editar</button>
           <button class="btn ghost btn-eliminar" data-id="${p.id}">🗑️ Eliminar</button>
@@ -327,3 +330,18 @@ function mp_showSnippetsFor(p) {
     alert('Copiado el <div> ✅');
   });
 }
+
+
+
+// ==========================
+//  Modal para imagen ampliada
+// ==========================
+$(document).on("click", ".mini-img", function () {
+  const src = $(this).attr("src");
+  $("#modalImgContenido").attr("src", src);
+  $("#modalImagen").fadeIn(150);
+});
+
+$("#modalImagen").on("click", function () {
+  $(this).fadeOut(150);
+});
