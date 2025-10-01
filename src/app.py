@@ -64,6 +64,12 @@ app.register_blueprint(popup)
 
 
 
+@app.teardown_appcontext
+def cleanup_scoped_session(exc):
+    try:
+        db.session.remove()
+    except Exception:
+        pass
 
 # ---------- Crear tablas (incluye 'popup') ----------
 with app.app_context():

@@ -5,22 +5,21 @@ from extensions import db
 @contextmanager
 def get_db_session():
     try:
-        yield db.session
+        yield db.session          # usás la scoped_session de SQLAlchemy
         db.session.commit()
     except Exception:
         db.session.rollback()
         raise
     finally:
-        # 1) Intentá cerrar la conexión activa (si existe y no está cerrada)
+        # cerrar conexión en uso (si hay) y devolverla al pool
         try:
             bind = db.session.get_bind()
             if bind and not getattr(bind, "closed", False):
-                db.session.close()   # devuelve la conexión al pool
+                db.session.close()
         except Exception:
-            # si ya estaba cerrada o no hay bind, lo ignoramos
             pass
         finally:
-            # 2) Siempre limpiar el scoped_session (seguro aunque ya se haya cerrado)
+            # importantísimo: limpiar la scoped_session
             try:
                 db.session.remove()
             except Exception:
