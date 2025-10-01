@@ -1,30 +1,31 @@
 (function () {
-  // ---------- utils ----------
-  const $ = (sel, root=document) => Array.prototype.slice.call(root.querySelectorAll(sel));
-  const attr = (el,n) => el && el.getAttribute ? el.getAttribute(n) : null;
+// ---------- utils ----------
+const $ = (sel, root=document) => Array.prototype.slice.call(root.querySelectorAll(sel));
+const attr = (el,n) => el && el.getAttribute ? el.getAttribute(n) : null;
 
-  // localizar el <script> real de embed.js
-  const SCRIPT = (() => {
-    const ss = document.getElementsByTagName('script');
-    for (let i = ss.length - 1; i >= 0; i--) {
-      const src = ss[i].src || "";
-      if (src.indexOf('/static/js/embed.js') !== -1) return ss[i];
-    }
-    return null;
-  })();
+// localizar SIEMPRE el <script> actual (vale para /embed.js o lo que sea)
+const SCRIPT = document.currentScript || (function () {
+  const ss = document.getElementsByTagName('script');
+  return ss[ss.length - 1] || null;
+})();
 
-  // origen del script (para absolutizar)
-  const origin = SCRIPT ? new URL(SCRIPT.src).origin : location.origin;
+// origen (https://dpia.site)
+const origin = (SCRIPT && SCRIPT.src) ? new URL(SCRIPT.src).origin : location.origin;
 
-  // config base (api single y api list)
-  let apiBase = (window.DPIA_POPUP_API || attr(SCRIPT,'data-api') || '/api/popup/');
-  if (apiBase.startsWith('/')) apiBase = origin + apiBase; // absolutizar
-  const apiList = apiBase.includes('?') ? (apiBase + '&list=1') : (apiBase + '?list=1');
+// ⚠️ IMPORTANTE: priorizar data-api y NUNCA usar globals de dev
+let apiBase = (attr(SCRIPT,'data-api') || '/api/popup/');
+if (apiBase.startsWith('/')) apiBase = origin + apiBase;  // absolutizar
+const apiList = apiBase.includes('?') ? (apiBase + '&list=1') : (apiBase + '?list=1');
 
-  const DEFAULTS = {
-    placeholderOn: ((attr(SCRIPT,'data-placeholder') || 'on').toLowerCase() !== 'off'),
-    placeholderColor: attr(SCRIPT,'data-placeholder-color') || '#ffd54f'
-  };
+// defaults visuales
+const DEFAULTS = {
+  placeholderOn: ((attr(SCRIPT,'data-placeholder') || 'on').toLowerCase() !== 'off'),
+  placeholderColor: attr(SCRIPT,'data-placeholder-color') || '#ffd54f'
+};
+
+// (opcional) para auditar rápido en consola:
+console.debug('[embed.js] origin=', origin, 'apiBase=', apiBase);
+
 
   function showPlaceholder(anchor, color, msg){
     const w = parseInt(attr(anchor,"data-width")||"400",10);
