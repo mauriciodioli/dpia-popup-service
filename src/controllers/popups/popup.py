@@ -43,7 +43,7 @@ SHEET_ID_DETECTOR_TENDENCIA = os.environ.get('SHEET_ID_DETECTOR_TENDENCIA')
 
 
 # ---------- Endpoint: crear popup ----------
-@popup.post("/admin/popup")
+@popup.post("/admin/popup/")
 def crear_popup():
     raw = request.get_json(silent=True) or request.form.to_dict(flat=True) or {}
     mapped = mapear_form_a_modelo(raw)
