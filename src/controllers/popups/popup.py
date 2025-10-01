@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash, jsonify
 from extensions import db
+from utils.db_session import get_db_session
 from sqlalchemy import func
 from models.usuario import Usuario
 from sqlalchemy.exc import SQLAlchemyError

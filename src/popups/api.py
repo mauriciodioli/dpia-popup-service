@@ -19,19 +19,34 @@ def api_popup():
         "lang": (b.get("lang") or q.get("lang") or ""),
         "cp": (b.get("cp") or q.get("cp") or ""),
     }
-    test_flag = (b.get("test") or q.get("test") or "").lower() in ("1", "true", "yes")
+    test_flag = (str(b.get("test") or q.get("test") or "")).lower() in ("1", "true", "yes")
+    is_list   = (q.get("list") == "1")  # ← clave: soportar ?list=1
+    limit     = b.get("limit") or q.get("limit")
 
-    print("METHOD:", request.method, "PARAMS:", params, "TEST:", test_flag, file=sys.stderr)
+    print("METHOD:", request.method, "PARAMS:", params, "TEST:", test_flag, "LIST:", is_list, "LIMIT:", limit, file=sys.stderr)
 
-    # 2) mock vs real
-    if test_flag:
+    # 2) modo test
+    if test_flag and not is_list:
         data = seleccionar_popup_test(**params)
         return jsonify({"found": True, **data}), 200
 
+    # 3) LISTA (cuando viene ?list=1)  → SIEMPRE devolver {"items":[...]}
+    if is_list:
+        items = seleccionar_popups(
+            dominio=params["dominio"],
+            categoria=params["categoria"],
+            lang=params["lang"],
+            cp=params["cp"],
+            limit=limit,   # opcional
+        ) or []
+        return jsonify({"items": items, "found": bool(items)}), 200
+
+    # 4) SINGLE por defecto
     data = seleccionar_popup(**params)
     if not data:
         return jsonify({"found": False}), 200
     return jsonify({"found": True, **data}), 200
+
 
 
 @api.get("/health")
