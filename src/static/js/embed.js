@@ -17,7 +17,7 @@
   const origin = SCRIPT ? new URL(SCRIPT.src).origin : location.origin;
 
   // config base (api single y api list)
-  let apiBase = (window.DPIA_POPUP_API || attr(SCRIPT,'data-api') || '/api/popup');
+  let apiBase = (window.DPIA_POPUP_API || attr(SCRIPT,'data-api') || '/api/popup/');
   if (apiBase.startsWith('/')) apiBase = origin + apiBase; // absolutizar
   const apiList = apiBase.includes('?') ? (apiBase + '&list=1') : (apiBase + '?list=1');
 

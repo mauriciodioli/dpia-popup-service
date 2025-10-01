@@ -147,7 +147,7 @@ def resolve_active_user_id_from_email(data: dict):
 
 
 # --- LISTAR por email (valida usuario activo) ---
-@popup.get("/admin/popup/list")
+@popup.get("/admin/popup/list/")
 def list_popups_by_email():
     email = (request.args.get("email") or "").strip().lower()
     if not email:
@@ -169,7 +169,7 @@ def list_popups_by_email():
 
 
 # --- OBTENER detalle ---
-@popup.get("/admin/popup/<int:popup_id>")
+@popup.get("/admin/popup/<int:popup_id>/")
 def get_popup(popup_id):
     p = db.session.get(Popup, popup_id)
     if not p:
@@ -178,7 +178,7 @@ def get_popup(popup_id):
 
 
 # --- ACTUALIZAR (PUT parcial) ---
-@popup.put("/admin/popup/<int:popup_id>")
+@popup.put("/admin/popup/<int:popup_id>/")
 def update_popup(popup_id):
     p = db.session.get(Popup, popup_id)
     if not p:
@@ -203,7 +203,7 @@ def update_popup(popup_id):
 
 
 # --- ELIMINAR ---
-@popup.delete("/admin/popup/<int:popup_id>")
+@popup.delete("/admin/popup/<int:popup_id>/")
 def delete_popup(popup_id):
     p = db.session.get(Popup, popup_id)
     if not p:

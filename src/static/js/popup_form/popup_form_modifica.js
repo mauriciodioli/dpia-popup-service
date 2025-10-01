@@ -36,8 +36,7 @@
         <td>${p.categoria_id ?? ""}</td>
         <td>${p.estado || ""}</td>
         <td>
-          ${p.imagen_url ? `<img src="${p.imagen_url}" alt="img" class="mini-img" style="width:40px; height:auto; border-radius:4px;">` : ''}
-        </td>
+         ${p.imagen_url ? `<img src="${p.imagen_url}" alt="img" class="mini-img">` : ''}
         <td>
           <button class="btn ghost btnSnippet" data-id="${p.id}">📎 Snippet</button>
           <button class="btn ghost btn-editar"  data-id="${p.id}">✏️ Editar</button>
@@ -83,7 +82,7 @@
       alert("Ingresá un correo válido.");
       return;
     }
-    $.getJSON("/admin/popup/list", { email }, function (resp) {
+    $.getJSON("/admin/popup/list/", { email }, function (resp) {
       if (!resp.ok) {
         alert("❌ " + (resp.error || "Error"));
         return;
@@ -120,7 +119,7 @@
     payload.categoria_id = payload.categoria_id ? parseInt(payload.categoria_id, 10) : null;
 
     $.ajax({
-      url: `/admin/popup/${id}`,
+      url: `/admin/popup/${id}/`,
       method: "PUT",
       contentType: "application/json",
       data: JSON.stringify(payload),
@@ -148,7 +147,7 @@
   $("#tablaPopups").on("click", ".btnSnippet", async function () {
     const id = $(this).data("id");
     try {
-      const r = await fetch(`/admin/popup/${id}`);
+      const r = await fetch(`/admin/popup/${id}/`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const j = await r.json();
       if (!j.ok || !j.popup) throw new Error(j.error || "Error");
@@ -162,7 +161,7 @@
   $("#tablaPopups").on("click", ".btn-editar", async function () {
     const id = $(this).data("id");
     try {
-      const r = await fetch(`/admin/popup/${id}`);
+      const r = await fetch(`/admin/popup/${id}/`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const j = await r.json();
       if (j.ok && j.popup) openModal(j.popup);
@@ -185,7 +184,7 @@
     }).then((res) => {
       if (!res.isConfirmed) return;
       $.ajax({
-        url: `/admin/popup/${id}`,
+        url: `/admin/popup/${id}/`,
         method: "DELETE",
         success: (r) => {
           if (r.ok) {

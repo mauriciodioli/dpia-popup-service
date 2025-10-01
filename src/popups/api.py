@@ -4,7 +4,7 @@ import sys
 
 api = Blueprint("api", __name__)
 
-@api.route("/api/popup", methods=["GET", "POST"])
+@api.route("/api/popup/", methods=["GET", "POST"])
 def api_popup():
     # logs visibles siempre
     print("💥 api_popup() ACTIVADO", file=sys.stderr)
@@ -40,7 +40,7 @@ def health():
 
 
 
-@api.route("/api/popup/list", methods=["POST"])
+@api.route("/api/popup/list/", methods=["POST"])
 def api_popup_list():
     b = request.get_json(silent=True) or {}
     items = seleccionar_popups(
